@@ -58,6 +58,12 @@ errors
 (test-error "name" thunk)                    ; pass if thunk raises an error
 ```
 
+All of these except `test-error` are syntax, so the expression under test is
+evaluated by the framework rather than at the call site. That is what lets a
+raise become a reported failure instead of aborting the run — see
+[Output format](#output-format). They are used exactly like procedures, but
+cannot be passed as values. `test-error` takes an explicit thunk.
+
 ### Reporting
 
 ```scheme
@@ -77,6 +83,22 @@ Failure:
   FAIL: test name
     expected: 42
     actual:   43
+```
+
+A test whose expression raises fails with the condition shown, and the run
+continues with the next test:
+```
+  FAIL: test name
+    expected: 42
+    raised:   type error in 'car': expected pair, got ()
+```
+
+A raise from inside a group but outside any assertion ends that group rather
+than the whole run:
+```
+  FAIL: <group aborted>
+    raised:   type error in 'car': expected pair, got ()
+    note:     remaining tests in this group did not run
 ```
 
 Summary:
